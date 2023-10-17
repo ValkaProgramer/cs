@@ -30,6 +30,6 @@ match choice:
             output_m += alphabet[(alphabet.index(char) + key_list[len(output_m) % len(key_list)]) % len(alphabet)]
     case 2:
         for char in input_m:
-            output_m += alphabet[(alphabet.index(char) - key_list[len(output_m) % len(key_list)]) - 1 % len(alphabet)]
+            output_m += alphabet[(alphabet.index(char) - key_list[len(output_m) % len(key_list)]) % len(alphabet)]
 
 print(f"Received {'message' if choice == 2 else 'cryptogram'}: {output_m}")
