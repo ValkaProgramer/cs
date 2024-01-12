@@ -1,36 +1,29 @@
 from random import randint
-from sympy import mod_inverse
+import hashlib
 
-def generate_keys(p, g):
-    private_a = randint(2, p - 2)
+def generate_diffie_hellman_parameters():
+    p = 3231700607131100730015351347782516336248805713348907517458843413926980683413621000279205636264016468545855635793533081692882902308057347262527355474246124574102620252791657297286270630032526342821314576693141422365422094111134862999165747826803423055308634905063555771221918789033272956969612974385624174123623722519734640269185579776797682301462539793305801522685873076119753243646747585546071504389684494036610497697812854295958659597567051283852132784468522925504568272879113720098931873959143374175837826000278034973198552060607533234122603254684088120031105907484281003994966956119696956248629032338072839127039
+    g = 2
+    private_a = randint(1, p - 1)
+    private_b = randint(1, p - 1)
     public_a = pow(g, private_a, p)
-    return public_a, private_a
+    public_b = pow(g, private_b, p)
+    common_secret_a = pow(public_b, private_a, p)
+    common_secret_b = pow(public_a, private_b, p)
 
-def elgamal_encrypt(message, p, g, public_key):
-    k = randint(1, p - 2)
-    hex_message = message.encode('utf-8').hex()
-    int_message = int(hex_message, 16)
-    C1 = pow(g, k, p)
-    C2 = (int_message * pow(public_key, k, p)) % p
-    return C1, C2
+    return p, g, private_a, public_a, private_b, public_b, common_secret_a, common_secret_b
 
-def elgamal_decrypt(C1, C2, p, private_key):
-    s = pow(C1, private_key, p)
-    s_inv = mod_inverse(s, p)
-    dec_int_message = (C2 * s_inv) % p
-    return bytes.fromhex(hex(dec_int_message)[2:]).decode('utf-8')
+def derive_key(common_secret, salt):
+    common_secret_bytes = common_secret.to_bytes((common_secret.bit_length() + 7) // 8, byteorder='big')
+    key = hashlib.sha256(common_secret_bytes + salt).digest()
+    return int.from_bytes(key, byteorder='big')
 
-p = 32317006071311007300153513477825163362488057133489075174588434139269806834136210002792056362640164685458556357935330816928829023080573472625273554742461245741026202527916572972862706300325263428213145766931414223654220941111348629991657478268034230553086349050635557712219187890332729569696129743856241741236237225197346402691855797767976823014625397933058015226858730761197532436467475855460715043896844903661304976978128542959586595975670512838521327844685229255045682728791137200989318739591433741758378268000278034973198552060607533234122603254684088121003994966956119696956248629032338072839127039
-g = 2
 
-public_a, private_a = generate_keys(p, g)
+p, g, private_a, public_a, private_b, public_b, common_secret_a, common_secret_b = generate_diffie_hellman_parameters()
 
-message = "Vladimir Luchianov"
-C1, C2 = elgamal_encrypt(message, p, g, public_a)
-decrypted_message = elgamal_decrypt(C1, C2, p, private_a)
-
-print(f"Original Message: {message}")
-print("Public key:", public_a)
-print("Private key:", private_a)
-print(f"Encrypted Message (C1, C2): ({C1}, {C2})")
-print(f"Decrypted Message: {decrypted_message}")
+print("Alice Private Key:", private_a)
+print("Bob Private Key:", private_b)
+print("\nAlice Public Key:", public_a)
+print("Bob Public Key:", public_b)
+print("\nShared Secret Key (Alice):", common_secret_a)
+print("Shared Secret Key (Bob):", common_secret_b)

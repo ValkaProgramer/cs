@@ -31,10 +31,13 @@ permutation_table =[14, 17, 11, 24, 1,  5,
                     44, 49, 39, 56, 34, 53,
                     46, 42, 50, 36, 29, 32]
 
+i = int(input())
 for round_number in range(1, 17):
-    print(f"Round {round_number}:")
-    print(f"C{round_number}:", bin(c_round)[2:].zfill(28))
-    print(f"D{round_number}:", bin(d_round)[2:].zfill(28))
+    if round_number == i:
+            
+        print(f"Round {round_number}:")
+        print(f"C{round_number}:", bin(c_round)[2:].zfill(28))
+        print(f"D{round_number}:", bin(d_round)[2:].zfill(28))
 
     temp = (c_round << 28) | d_round
     temp_str = ""
@@ -43,10 +46,8 @@ for round_number in range(1, 17):
         temp_str += bin(temp)[2:].zfill(56)[permutation_table[index] - 1]
 
     k_round = int(temp_str, 2)
-
-    print(f"K{round_number}:", bin(k_round)[2:].zfill(48))
-
-    print()
+    if round_number == i:
+        print(f"K{round_number}:", bin(k_round)[2:].zfill(48))
 
     # Update c_round and d_round for the next round
     c_round, d_round = next_round(c_round, d_round, round_number)
